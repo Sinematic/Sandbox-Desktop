@@ -1,4 +1,3 @@
-# Blender discovery started there
+# Welcome at my desk
 
-I created my first ever item on Blender: a burger !
-
+Hey, what did you expect ? it's lunch time !

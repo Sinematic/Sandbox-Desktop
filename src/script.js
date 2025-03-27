@@ -26,17 +26,44 @@ const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
 let mixer = null
-let burger
+let burger, plate, desktop
 
 gltfLoader.load(
     '/models/burger.glb',
     (gltf) =>
     {
         burger = gltf.scene
-        burger.position.y = 1.5
+        burger.position.y = 1.89
+        burger.scale.set(0.02, 0.02, 0.02)
         scene.add(burger)
+        //gui.add(burger.position, 'y').min(2).max(3).step(0.001).name('Hauteur Burger')
+
     }
 )
+
+
+gltfLoader.load(
+    '/models/desktop.glb',
+    (gltf) =>
+    {
+        desktop = gltf.scene
+        desktop.position.y = 1
+        scene.add(desktop)
+    }
+)
+
+gltfLoader.load(
+    '/models/plate.glb',
+    (gltf) =>
+    {
+        plate = gltf.scene
+        plate.position.y = 1.67
+        plate.scale.set(0.4, 0.4, 0.4)
+        scene.add(plate)
+        gui.add(plate.position, 'y').min(1.2).max(2).step(0.001).name('Hauteur Assiette')
+    }
+)
+
 
 /**
  * Floor
@@ -46,7 +73,7 @@ const floor = new THREE.Mesh(
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
-        roughness: 0.5
+        roughness: 1
     })
 )
 floor.receiveShadow = true
@@ -70,6 +97,8 @@ directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 5, 5)
 directionalLight.lookAt(0, 0, 0)
 scene.add(directionalLight)
+
+gui.add(directionalLight, 'intensity').min(0).max(10).step(0.01)
 
 /**
  * Sizes

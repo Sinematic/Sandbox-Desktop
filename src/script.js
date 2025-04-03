@@ -17,6 +17,22 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
+ * Textures
+ */
+
+const textureLoader = new THREE.TextureLoader()
+const floorColorTexture = textureLoader.load('/textures/laminate_floor/laminate_floor_02_diff_1k.jpg')
+const floorARMTexture = textureLoader.load('/textures/laminate_floor/laminate_floor_02_arm_1k.jpg')
+const floorNormalTexture = textureLoader.load('/textures/laminate_floor/laminate_floor_02_nor_gl_1k.jpg')
+const floorDisplacementTexture = textureLoader.load('/textures/laminate_floor/laminate_floor_02_disp_1k.jpg')
+
+floorColorTexture.repeat.set(3, 3)
+floorColorTexture.wrapS = THREE.RepeatWrapping
+floorColorTexture.wrapT = THREE.RepeatWrapping
+
+floorColorTexture.colorSpace = THREE.SRGBColorSpace
+
+/**
  * Models
  */
 const dracoLoader = new DRACOLoader()
@@ -26,7 +42,7 @@ const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
 let mixer = null
-let burger, plate, desktop
+let burger, plate, desktop, phone
 
 gltfLoader.load(
     '/models/burger.glb',
@@ -64,26 +80,44 @@ gltfLoader.load(
     }
 )
 
+gltfLoader.load(
+'/models/phone.glb',
+(gltf) =>
+{
+    phone = gltf.scene
+    phone.position.set(0.5, 1.84, 1)
+    phone.scale.set(0.05, 0.05, 0.05)
+    scene.add(phone)
+    //gui.add(burger.position, 'y').min(2).max(3).step(0.001).name('Hauteur Burger')
+
+}
+)
+
 
 /**
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(50, 50),
+    new THREE.PlaneGeometry(12, 12),
     new THREE.MeshStandardMaterial({
-        color: '#444444',
-        metalness: 0,
-        roughness: 1
+        transparent: true,
+        map: floorColorTexture,
+        aoMap: floorARMTexture,
+        roughnessMap: floorARMTexture,
+        metalnessMap: floorARMTexture,
+        normalMap: floorNormalTexture,
+        displacementMap: floorDisplacementTexture,
     })
 )
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
+floor.rotation.z = - Math.PI * 0.5
 scene.add(floor)
 
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
 scene.add(ambientLight)
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
@@ -96,9 +130,11 @@ directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 5, 5)
 directionalLight.lookAt(0, 0, 0)
+directionalLight.castShadow = true;
 scene.add(directionalLight)
 
 gui.add(directionalLight, 'intensity').min(0).max(10).step(0.01)
+
 
 /**
  * Sizes
@@ -128,7 +164,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(- 8, 4, 8)
+camera.position.set(3, 3, 1)
 scene.add(camera)
 
 // Controls
